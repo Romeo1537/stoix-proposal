@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What I Would Build at STOIX // Romeo Lam</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--indigo:#241E4E;--coral:#F1594C;--black:#000;--white:#FFF;--grey:#F5F5F5}
+html{overflow-x:hidden}
+body{font-family:'Inter',sans-serif;color:var(--indigo);background:var(--black);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.wrapper{width:1100px;max-width:90%;margin:0 auto}
+
+/* LOADER */
+.loader{position:fixed;inset:0;z-index:9999;background:var(--black);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity 0.6s,visibility 0.6s}
+.loader.done{opacity:0;visibility:hidden;pointer-events:none}
+.loader-bar{width:200px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.loader-fill{width:0%;height:100%;background:var(--coral);transition:width 0.3s}
+.loader-text{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:4px;color:rgba(255,255,255,0.4);text-transform:uppercase}
+
+/* NAV DOTS */
+.nav-dots{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:14px}
+.nav-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);background:transparent;cursor:pointer;transition:all 0.4s}
+.nav-dot.active{background:var(--coral);border-color:var(--coral);transform:scale(1.5)}
+.nav-dot:hover{border-color:var(--coral)}
+
+/* HERO */
+.hero{position:relative;height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--black)}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero .wrapper{position:relative;z-index:2}
+.hero-label{font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:24px;opacity:0}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,11vw,130px);line-height:0.85;text-transform:uppercase;letter-spacing:3px;color:var(--white);margin-bottom:28px}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line-inner{display:block;transform:translateY(105%)}
+.hero h1 span{color:var(--coral)}
+.hero-sub{font-size:17px;max-width:520px;line-height:1.8;color:rgba(255,255,255,0.6);font-weight:300;opacity:0}
+.hero-meta{position:absolute;bottom:120px;right:0;text-align:right;font-size:13px;color:rgba(255,255,255,0.5);opacity:0}
+.hero-meta strong{display:block;font-size:15px;color:var(--white);font-weight:600}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);opacity:0}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--coral),transparent);animation:scrollPulse 2s infinite}
+@keyframes scrollPulse{0%,100%{opacity:0.3;transform:scaleY(0.7)}50%{opacity:1;transform:scaleY(1)}}
+
+/* SECTIONS */
+section{position:relative;padding:140px 0 120px;overflow:hidden}
+section.dark{background:var(--black);color:var(--white)}
+section.indigo{background:var(--indigo);color:var(--white)}
+section.light{background:var(--white);color:var(--indigo)}
+section.grey{background:var(--grey);color:var(--indigo)}
+
+.angle-cut::after{content:'';position:absolute;bottom:-1px;left:-5%;right:-5%;height:clamp(80px,10vw,140px);z-index:3}
+.angle-cut-white::after{background:var(--white);clip-path:polygon(0 100%,100% 100%,100% 0)}
+.angle-cut-dark::after{background:var(--black);clip-path:polygon(0 100%,100% 100%,0 0)}
+.angle-cut-indigo::after{background:var(--indigo);clip-path:polygon(0 100%,100% 100%,100% 0)}
+.angle-cut-grey::after{background:var(--grey);clip-path:polygon(0 100%,100% 100%,0 0)}
+
+.section-label{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,9vw,100px);text-transform:uppercase;line-height:0.85;letter-spacing:3px;margin-bottom:30px}
+.section-label span{color:var(--coral)}
+.section-intro{font-size:17px;max-width:560px;line-height:1.8;margin-bottom:60px;font-weight:300;opacity:0.7}
+
+/* AMBIENT PARTICLES */
+.ambient-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0.4}
+
+/* TIMELINE */
+.timeline-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.timeline-card{border-radius:10px;overflow:hidden;opacity:0;transform:translateY(60px) scale(0.95)}
+.tc-header{padding:20px 24px;font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1.2px;display:flex;align-items:center;gap:12px;color:var(--white)}
+.tc-header svg{width:24px;height:24px;flex-shrink:0}
+.tc-1 .tc-header{background:var(--indigo)}
+.tc-2 .tc-header{background:var(--coral)}
+.tc-3 .tc-header{background:var(--black);border:1px solid rgba(255,255,255,0.1)}
+.tc-body{padding:22px 24px;background:var(--white);color:var(--indigo);list-style:none}
+.tc-body li{position:relative;padding:7px 0 7px 20px;font-size:14px;line-height:1.6}
+.tc-body li::before{content:'';position:absolute;top:15px;left:0;width:7px;height:7px;border-radius:50%;background:var(--coral)}
+
+/* HORIZONTAL SCROLL STREAMS */
+.streams-section{overflow:hidden}
+.streams-pin{display:flex;flex-wrap:nowrap;gap:32px;padding-right:100px}
+.stream-card{min-width:340px;width:340px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:36px 28px 28px;position:relative;overflow:hidden;flex-shrink:0;transition:border-color 0.4s,background 0.4s,transform 0.4s}
+.stream-card:hover{background:rgba(255,255,255,0.1);border-color:var(--coral);transform:translateY(-6px)!important}
+.sc-number{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--coral);opacity:0.1;position:absolute;top:-12px;right:12px;line-height:1}
+.sc-icon{width:32px;height:32px;margin-bottom:14px;color:var(--coral)}
+.stream-card h3{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;color:var(--white)}
+.stream-card p{font-size:14px;line-height:1.7;color:rgba(255,255,255,0.6);margin-bottom:16px;font-weight:300}
+.tool-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tool-tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:4px;background:var(--coral);color:var(--white);letter-spacing:0.5px}
+
+/* PROOF */
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.proof-card{background:var(--white);border-radius:12px;padding:36px 28px;position:relative;overflow:hidden;border-top:4px solid var(--coral);opacity:0;transform:translateY(60px)}
+.proof-card:hover{transform:translateY(-6px)!important}
+.pc-number{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--coral);opacity:0.08;position:absolute;top:-12px;right:12px;line-height:1}
+.proof-card h3{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;color:var(--coral)}
+.proof-card p{font-size:14px;line-height:1.7;color:#555;font-weight:400}
+
+/* COUNTERS */
+.counter-row{display:flex;gap:48px;justify-content:center;margin-top:70px;flex-wrap:wrap}
+.counter-item{text-align:center}
+.counter-val{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--coral);line-height:1}
+.counter-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:8px;color:rgba(255,255,255,0.5)}
+
+/* APPROACH */
+.approach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+.approach-item{text-align:center;opacity:0;transform:translateY(40px)}
+.ai-circle{width:80px;height:80px;border-radius:50%;border:2px solid var(--coral);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;transition:all 0.4s}
+.approach-item:hover .ai-circle{background:var(--coral);transform:scale(1.15) rotate(10deg)}
+.approach-item:hover .ai-circle svg{color:var(--white)}
+.ai-circle svg{width:28px;height:28px;color:var(--coral);transition:color 0.4s}
+.approach-item h4{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;color:var(--coral)}
+.approach-item p{font-size:13px;line-height:1.7;color:rgba(255,255,255,0.6);font-weight:300}
+
+/* FOOTER */
+.site-footer{background:var(--indigo);color:var(--white);padding:60px 0;text-align:center}
+.footer-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.footer-role{font-size:14px;opacity:0.5;margin-bottom:6px;font-weight:300}
+.footer-email a{color:var(--coral);text-decoration:none;font-size:15px;font-weight:600;transition:opacity 0.3s}
+.footer-email a:hover{opacity:0.7}
+.footer-line{width:60px;height:3px;background:var(--coral);margin:24px auto 0}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .timeline-grid{grid-template-columns:1fr}
+  .proof-grid{grid-template-columns:1fr}
+  .approach-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-meta{position:static;text-align:left;margin-top:30px}
+  .nav-dots{display:none}
+  .stream-card{min-width:280px;width:280px}
+}
+@media(max-width:600px){
+  .approach-grid{grid-template-columns:1fr}
+  section{padding:80px 0 60px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-text">Loading</div>
+  <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+</div>
+
+<!-- NAV DOTS -->
+<div class="nav-dots" id="navDots">
+  <div class="nav-dot active" data-target="hero"></div>
+  <div class="nav-dot" data-target="timeline"></div>
+  <div class="nav-dot" data-target="streams"></div>
+  <div class="nav-dot" data-target="proof"></div>
+  <div class="nav-dot" data-target="approach"></div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="wrapper">
+    <div class="hero-label" id="heroLabel">AI Operations & Growth Lead // STOIX</div>
+    <h1>
+      <span class="line"><span class="line-inner">What I</span></span>
+      <span class="line"><span class="line-inner">Would <span>Build</span></span></span>
+    </h1>
+    <p class="hero-sub" id="heroSub">STOIX wants to operate like a tech company while staying lean. One person with AI fluency can give a 10-person firm the output capacity of a much larger one.</p>
+    <div class="hero-meta" id="heroMeta">
+      <strong>Romeo Lam</strong>
+      romeo.lam556@gmail.com<br>
+      April 2026
+    </div>
+  </div>
+  <div class="hero-scroll" id="heroScroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="light angle-cut angle-cut-dark" id="timeline" style="padding-bottom:180px">
+  <div class="wrapper">
+    <div class="section-label" id="timelineLabel">First <span>90 Days</span></div>
+    <p class="section-intro" id="timelineIntro">Map the landscape. Build the highest-impact tools. Scale what works. No assumptions, no wasted motion.</p>
+    <div class="timeline-grid">
+      <div class="timeline-card tc-1">
+        <div class="tc-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Weeks 1-2 // Map
+        </div>
+        <ul class="tc-body">
+          <li>Shadow every team member through a full process cycle</li>
+          <li>Document inputs, outputs, handoffs, and pain points</li>
+          <li>Audit current tools: CRM, ATS, content, comms</li>
+          <li>Identify highest-value automation targets</li>
+        </ul>
+      </div>
+      <div class="timeline-card tc-2">
+        <div class="tc-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Weeks 3-6 // Build
+        </div>
+        <ul class="tc-body">
+          <li>Ship first automation: candidate presentation templates</li>
+          <li>Prototype BD trigger monitoring workflow</li>
+          <li>Build Claude-powered briefing pack generator</li>
+          <li>Set up LinkedIn content scheduling pipeline</li>
+        </ul>
+      </div>
+      <div class="timeline-card tc-3">
+        <div class="tc-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Weeks 7-12 // Scale
+        </div>
+        <ul class="tc-body">
+          <li>Full client deliverable system running in production</li>
+          <li>Chat CFO ops systematised: guest pipeline and outreach</li>
+          <li>Content engine producing consistent weekly output</li>
+          <li>Measure: hours saved, output quality, pipeline impact</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FIVE STREAMS (horizontal scroll) -->
+<section class="dark streams-section" id="streams" style="padding-bottom:180px">
+  <div class="wrapper" style="margin-bottom:40px">
+    <div class="section-label" id="streamsLabel">The Five <span>Streams</span></div>
+    <p class="section-intro" style="color:rgba(255,255,255,0.5)">Five work areas. One integrated system. Each stream feeds the others. Scroll to explore.</p>
+  </div>
+  <div style="overflow:hidden">
+    <div class="streams-pin" id="streamsPin">
+      <div style="min-width:calc((100vw - 1100px)/2);flex-shrink:0"></div>
+      <div class="stream-card">
+        <div class="sc-number">01</div>
+        <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <h3>Automation & Productivity</h3>
+        <p>Map processes. Automate the repeatable. Build internal tools that eliminate manual work and free consultant hours for revenue activity.</p>
+        <div class="tool-tags"><span class="tool-tag">Claude</span><span class="tool-tag">Replit</span><span class="tool-tag">Notion</span></div>
+      </div>
+      <div class="stream-card">
+        <div class="sc-number">02</div>
+        <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <h3>Client Deliverables</h3>
+        <p>Candidate shortlists, search reports, and presentations. Systems that produce world-class output fast and make competitors look amateur.</p>
+        <div class="tool-tags"><span class="tool-tag">Claude</span><span class="tool-tag">Lovable</span><span class="tool-tag">Templates</span></div>
+      </div>
+      <div class="stream-card">
+        <div class="sc-number">03</div>
+        <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <h3>BD Intelligence</h3>
+        <p>Trigger-based, not static. Automated monitoring for CFO moves, PE transactions, headcount signals. Pre-built briefing packs that populate live.</p>
+        <div class="tool-tags"><span class="tool-tag">Claude Code</span><span class="tool-tag">APIs</span></div>
+      </div>
+      <div class="stream-card">
+        <div class="sc-number">04</div>
+        <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h3>Marketing & Brand</h3>
+        <p>Content engine for STOIX and founder personal brands. LinkedIn production, scheduling, performance tracking. Systematic, not sporadic.</p>
+        <div class="tool-tags"><span class="tool-tag">Scheduling</span><span class="tool-tag">Analytics</span></div>
+      </div>
+      <div class="stream-card">
+        <div class="sc-number">05</div>
+        <svg class="sc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        <h3>Podcast // Chat CFO</h3>
+        <p>Systematise the machine: guest pipeline, outreach workflows, production process. Turn content into a scalable BD channel.</p>
+        <div class="tool-tags"><span class="tool-tag">Workflows</span><span class="tool-tag">CRM</span></div>
+      </div>
+      <div style="min-width:60px;flex-shrink:0"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="indigo angle-cut angle-cut-dark" id="proof" style="padding-bottom:200px">
+  <canvas class="ambient-canvas" id="ambientCanvas"></canvas>
+  <div class="wrapper" style="position:relative;z-index:1">
+    <div class="section-label" id="proofLabel">Proof of <span>Build</span></div>
+    <p class="section-intro" style="color:rgba(255,255,255,0.5)">Not what I would like to do. What I have already done.</p>
+    <div class="proof-grid">
+      <div class="proof-card">
+        <div class="pc-number">01</div>
+        <h3>HAC Operations System</h3>
+        <p>Identified a gap at the Honourable Artillery Company. Built an AI-augmented operations system from scratch using Notion and Claude. Automates task generation, run-sheets, supplier briefs, and risk assessments. No brief, no precedent, no developer. Now runs how the team operates.</p>
+      </div>
+      <div class="proof-card">
+        <div class="pc-number">02</div>
+        <h3>Daily AI Workflow</h3>
+        <p>Maintain a full Claude Code workflow for daily planning, automation, and document production. Built structured pipelines for research, scoring, document generation, and tracking across multiple systems. Not a side project. It runs how I actually work.</p>
+      </div>
+      <div class="proof-card">
+        <div class="pc-number">03</div>
+        <h3>BD Intelligence in Practice</h3>
+        <p>My outreach to Neil was itself trigger-based BD: identified the signal, researched the company, reached out with a tailored, specific proposal. That method, systematised and scaled, is what I would build for STOIX at scale, for every client conversation.</p>
+      </div>
+    </div>
+    <div class="counter-row" id="counterRow">
+      <div class="counter-item"><div class="counter-val" data-target="1">0</div><div class="counter-label">Full system built from zero</div></div>
+      <div class="counter-item"><div class="counter-val" data-target="5">0</div><div class="counter-label">Integrated work streams</div></div>
+      <div class="counter-item"><div class="counter-val" data-target="90">0</div><div class="counter-label">Days to measurable impact</div></div>
+      <div class="counter-item"><div class="counter-val" data-target="0">0</div><div class="counter-label">Developers required</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="dark" id="approach">
+  <div class="wrapper">
+    <div class="section-label" id="approachLabel">How I <span>Work</span></div>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <div class="ai-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+        <h4>Understand First</h4>
+        <p>Shadow, map, and document before building anything. No assumptions. No wasted effort.</p>
+      </div>
+      <div class="approach-item">
+        <div class="ai-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <h4>Impact Over Activity</h4>
+        <p>Prioritise by time saved and revenue impact. Ship fast, measure, iterate. Output, not hours.</p>
+      </div>
+      <div class="approach-item">
+        <div class="ai-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h4>Augment, Not Replace</h4>
+        <p>Build tools that make consultants faster. The team's expertise stays central. AI serves the people.</p>
+      </div>
+      <div class="approach-item">
+        <div class="ai-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h4>Measure Everything</h4>
+        <p>Hours saved, quality uplift, pipeline contribution. Make the impact visible and accountable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="wrapper">
+    <div class="footer-name">Romeo Lam</div>
+    <div class="footer-role">AI Operations & Growth Lead // STOIX</div>
+    <div class="footer-email"><a href="mailto:romeo.lam556@gmail.com">romeo.lam556@gmail.com</a></div>
+    <div class="footer-line"></div>
+  </div>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ==================== LOADER ====================
+let loadProgress = 0;
+const loaderFill = document.getElementById('loader-fill');
+const loaderInterval = setInterval(() => {
+  loadProgress += Math.random() * 30 + 10;
+  if (loadProgress > 100) loadProgress = 100;
+  loaderFill.style.width = loadProgress + '%';
+  if (loadProgress >= 100) {
+    clearInterval(loaderInterval);
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('done');
+      startHeroAnimation();
+    }, 400);
+  }
+}, 200);
+
+// ==================== 3D PARTICLE BUST ====================
+const canvas = document.getElementById('hero-canvas');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Generate classical bust particle positions
+const particleCount = 4000;
+const positions = new Float32Array(particleCount * 3);
+const origins = new Float32Array(particleCount * 3);
+const randoms = new Float32Array(particleCount);
+
+function generateBustPoints(i) {
+  // Cranium: sphere
+  // Face: front-facing ellipsoid
+  // Neck: cylinder
+  // Shoulders: wide cylinder
+  const section = Math.random();
+  let x, y, z;
+
+  if (section < 0.35) {
+    // Cranium
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI * 0.6;
+    const r = 0.9 + Math.random() * 0.15;
+    x = r * Math.sin(phi) * Math.cos(theta);
+    y = r * Math.cos(phi) + 0.6;
+    z = r * Math.sin(phi) * Math.sin(theta) * 0.85;
+  } else if (section < 0.55) {
+    // Face area
+    const theta = Math.random() * Math.PI * 0.8 - Math.PI * 0.4;
+    const fy = Math.random() * 1.2 - 0.3;
+    const r = 0.75 + Math.random() * 0.12;
+    x = r * Math.sin(theta);
+    y = fy;
+    z = r * Math.cos(theta) * 0.7 + 0.3;
+  } else if (section < 0.7) {
+    // Neck
+    const theta = Math.random() * Math.PI * 2;
+    const r = 0.35 + Math.random() * 0.1;
+    x = r * Math.cos(theta);
+    y = -0.6 + Math.random() * 0.5;
+    z = r * Math.sin(theta);
+  } else if (section < 0.85) {
+    // Shoulders
+    const spread = (Math.random() - 0.5) * 3.2;
+    const r = 0.25 + Math.random() * 0.15;
+    const theta = Math.random() * Math.PI * 2;
+    x = spread;
+    y = -1.2 + Math.random() * 0.4 - Math.abs(spread) * 0.15;
+    z = r * Math.sin(theta);
+  } else {
+    // Chest/torso hint
+    const spread = (Math.random() - 0.5) * 2.4;
+    x = spread;
+    y = -1.6 + Math.random() * 0.5;
+    z = (Math.random() - 0.5) * 0.6;
+  }
+
+  return [x, y, z];
+}
+
+for (let i = 0; i < particleCount; i++) {
+  const [x, y, z] = generateBustPoints(i);
+  origins[i * 3] = x;
+  origins[i * 3 + 1] = y;
+  origins[i * 3 + 2] = z;
+  // Start scattered
+  positions[i * 3] = (Math.random() - 0.5) * 20;
+  positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+  randoms[i] = Math.random();
+}
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+const material = new THREE.PointsMaterial({
+  size: 0.025,
+  color: new THREE.Color('#F1594C'),
+  transparent: true,
+  opacity: 0.8,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const points = new THREE.Points(geometry, material);
+points.position.x = 1.8;
+points.position.y = 0.3;
+scene.add(points);
+
+// Connection lines
+const lineGeo = new THREE.BufferGeometry();
+const linePositions = new Float32Array(2000 * 6);
+const lineMat = new THREE.LineBasicMaterial({
+  color: new THREE.Color('#F1594C'),
+  transparent: true,
+  opacity: 0.06,
+  blending: THREE.AdditiveBlending
+});
+const lines = new THREE.LineSegments(lineGeo, lineMat);
+lines.position.copy(points.position);
+scene.add(lines);
+
+let assembleProgress = 0;
+let rotationY = 0;
+let disperseAmount = 0;
+let mouseX = 0, mouseY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+function updateParticles() {
+  const pos = geometry.attributes.position.array;
+  for (let i = 0; i < particleCount; i++) {
+    const i3 = i * 3;
+    const ox = origins[i3], oy = origins[i3 + 1], oz = origins[i3 + 2];
+    const disp = disperseAmount * (2 + randoms[i] * 5);
+    const tx = ox + (randoms[i] - 0.5) * disp;
+    const ty = oy + (randoms[i] - 0.5) * disp;
+    const tz = oz + (randoms[i] - 0.5) * disp;
+    // Smooth interpolation toward target
+    pos[i3] += (tx - pos[i3]) * (0.02 + assembleProgress * 0.05);
+    pos[i3 + 1] += (ty - pos[i3 + 1]) * (0.02 + assembleProgress * 0.05);
+    pos[i3 + 2] += (tz - pos[i3 + 2]) * (0.02 + assembleProgress * 0.05);
+    // Subtle breathing
+    pos[i3 + 1] += Math.sin(Date.now() * 0.001 + randoms[i] * 10) * 0.001;
+  }
+  geometry.attributes.position.needsUpdate = true;
+
+  // Update connection lines
+  let lineIdx = 0;
+  const maxLines = 2000;
+  const threshold = 0.35;
+  for (let i = 0; i < particleCount && lineIdx < maxLines; i += 4) {
+    for (let j = i + 4; j < particleCount && lineIdx < maxLines; j += 4) {
+      const dx = pos[i*3] - pos[j*3];
+      const dy = pos[i*3+1] - pos[j*3+1];
+      const dz = pos[i*3+2] - pos[j*3+2];
+      const dist = dx*dx + dy*dy + dz*dz;
+      if (dist < threshold * threshold) {
+        linePositions[lineIdx*6] = pos[i*3];
+        linePositions[lineIdx*6+1] = pos[i*3+1];
+        linePositions[lineIdx*6+2] = pos[i*3+2];
+        linePositions[lineIdx*6+3] = pos[j*3];
+        linePositions[lineIdx*6+4] = pos[j*3+1];
+        linePositions[lineIdx*6+5] = pos[j*3+2];
+        lineIdx++;
+      }
+    }
+  }
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions.slice(0, lineIdx * 6), 3));
+  lineGeo.attributes.position.needsUpdate = true;
+  lineGeo.setDrawRange(0, lineIdx * 2);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  rotationY += 0.002;
+  points.rotation.y = rotationY + mouseX * 0.15;
+  points.rotation.x = mouseY * 0.08;
+  lines.rotation.y = points.rotation.y;
+  lines.rotation.x = points.rotation.x;
+  updateParticles();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Scroll-driven assembly/dispersal
+ScrollTrigger.create({
+  trigger: '#hero',
+  start: 'top top',
+  end: 'bottom top',
+  onUpdate: (self) => {
+    // Assembly in first 30%, then disperse
+    const p = self.progress;
+    if (p < 0.3) {
+      assembleProgress = p / 0.3;
+      disperseAmount = 0;
+    } else {
+      assembleProgress = 1;
+      disperseAmount = (p - 0.3) / 0.7;
+    }
+    material.opacity = Math.max(0.1, 1 - p * 0.8);
+    lineMat.opacity = Math.max(0, 0.06 - p * 0.06);
+  }
+});
+
+// ==================== HERO ENTRANCE ====================
+function startHeroAnimation() {
+  const tl = gsap.timeline();
+  tl.to('.line-inner', {
+    y: 0, duration: 1, stagger: 0.15, ease: 'power4.out'
+  })
+  .to('#heroLabel', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.3)
+  .to('#heroSub', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.6)
+  .to('#heroMeta', { opacity: 1, duration: 0.8 }, 0.8)
+  .to('#heroScroll', { opacity: 1, duration: 0.8 }, 1);
+}
+
+// ==================== TIMELINE CARDS ====================
+gsap.utils.toArray('.timeline-card').forEach((card, i) => {
+  gsap.to(card, {
+    opacity: 1, y: 0, scale: 1, duration: 0.8,
+    delay: i * 0.15,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 85%' }
+  });
+});
+
+// ==================== HORIZONTAL SCROLL STREAMS ====================
+const streamsPin = document.getElementById('streamsPin');
+const totalScroll = streamsPin.scrollWidth - window.innerWidth;
+
+gsap.to(streamsPin, {
+  x: -totalScroll,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '#streams',
+    start: 'top top',
+    end: () => '+=' + totalScroll,
+    pin: true,
+    scrub: 1,
+    anticipatePin: 1,
+    invalidateOnRefresh: true
+  }
+});
+
+// ==================== PROOF CARDS ====================
+gsap.utils.toArray('.proof-card').forEach((card, i) => {
+  gsap.to(card, {
+    opacity: 1, y: 0, duration: 0.8,
+    delay: i * 0.15,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 85%' }
+  });
+});
+
+// ==================== COUNTERS ====================
+let countersDone = false;
+ScrollTrigger.create({
+  trigger: '#counterRow',
+  start: 'top 80%',
+  onEnter: () => {
+    if (countersDone) return;
+    countersDone = true;
+    document.querySelectorAll('.counter-val').forEach(el => {
+      const target = parseInt(el.dataset.target);
+      gsap.to({ val: 0 }, {
+        val: target, duration: 2, ease: 'power2.out',
+        onUpdate: function() { el.textContent = Math.round(this.targets()[0].val); }
+      });
+    });
+  }
+});
+
+// ==================== APPROACH ====================
+gsap.utils.toArray('.approach-item').forEach((item, i) => {
+  gsap.to(item, {
+    opacity: 1, y: 0, duration: 0.8,
+    delay: i * 0.12,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: item, start: 'top 85%' }
+  });
+});
+
+// ==================== SECTION LABELS ====================
+['#timelineLabel','#streamsLabel','#proofLabel','#approachLabel'].forEach(sel => {
+  gsap.from(sel, {
+    y: 60, opacity: 0, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: sel, start: 'top 85%' }
+  });
+});
+
+// ==================== NAV DOTS ====================
+const sections = ['hero','timeline','streams','proof','approach'];
+const dots = document.querySelectorAll('.nav-dot');
+
+sections.forEach((id, i) => {
+  ScrollTrigger.create({
+    trigger: '#' + id,
+    start: 'top center',
+    end: 'bottom center',
+    onToggle: (self) => {
+      if (self.isActive) {
+        dots.forEach(d => d.classList.remove('active'));
+        dots[i].classList.add('active');
+      }
+    }
+  });
+});
+
+dots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    const el = document.getElementById(dot.dataset.target);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// ==================== AMBIENT PARTICLES ====================
+const ambCanvas = document.getElementById('ambientCanvas');
+if (ambCanvas) {
+  const actx = ambCanvas.getContext('2d');
+  let aw, ah;
+  const aparticles = [];
+
+  function resizeAmbient() {
+    const rect = ambCanvas.parentElement.getBoundingClientRect();
+    aw = ambCanvas.width = rect.width;
+    ah = ambCanvas.height = rect.height;
+  }
+  resizeAmbient();
+  window.addEventListener('resize', resizeAmbient);
+
+  for (let i = 0; i < 60; i++) {
+    aparticles.push({
+      x: Math.random() * aw,
+      y: Math.random() * ah,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 2 + 1
+    });
+  }
+
+  function drawAmbient() {
+    actx.clearRect(0, 0, aw, ah);
+    aparticles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = aw; if (p.x > aw) p.x = 0;
+      if (p.y < 0) p.y = ah; if (p.y > ah) p.y = 0;
+      actx.beginPath();
+      actx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      actx.fillStyle = 'rgba(241,89,76,0.3)';
+      actx.fill();
+    });
+    // Connection lines
+    for (let i = 0; i < aparticles.length; i++) {
+      for (let j = i + 1; j < aparticles.length; j++) {
+        const dx = aparticles[i].x - aparticles[j].x;
+        const dy = aparticles[i].y - aparticles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          actx.beginPath();
+          actx.moveTo(aparticles[i].x, aparticles[i].y);
+          actx.lineTo(aparticles[j].x, aparticles[j].y);
+          actx.strokeStyle = `rgba(241,89,76,${0.1 * (1 - dist / 120)})`;
+          actx.lineWidth = 0.5;
+          actx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawAmbient);
+  }
+  drawAmbient();
+}
+</script>
+
+</body>
+</html>
